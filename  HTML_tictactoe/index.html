@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Saira Semi Condensed" rel="stylesheet" type="text/css">
+
+  
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+
+  <div class='pca-hold'>
+  <div class='pca-main'><!--Screen-->
+    <div class='pca-inner' id="gameScr">
+      <div class="dimmer" id="dimmer">
+        <div id="msgScreen"> <!-- Message Screen -->
+          <h2 id="msgTitle">Choose difficulty level</h2>
+          <div id="msgRest">
+            <button id="easy" onclick="easy()" class="btn">Easy</button>
+            <button id="difficult" onclick="difficult()" class="btn">Hard</button>
+          </div>
+        </div> <!-- /Message Screen -->
+      </div>
+      <h1> Tic Tac Toe</h1>
+      <div id="playerHighlighter"></div>
+      <h4 id="score"><b>Player O: 0<span style="display:inline-block; width: 20px;"></span>Player X: 0</b>
+        <button id="resetBtn" onclick="reset()"><i class="fa fa-undo" aria-hidden="true"> Reset</i>
+</button></h4>
+      <div id="tableContainer">
+        <table>
+          <tr>
+            <td id="1" onclick="game(1)"></td>
+            <td class="center" id="2" onclick="game(2)"></td>
+            <td id="3" onclick="game(3)"></td>
+          </tr>
+          <tr>
+            <td  class="middle" id="4" onclick="game(4)"></td>
+            <td class="middle-center" id="5" onclick="game(5)"></td>
+            <td class="middle" id="6" onclick="game(6)"></td>
+          </tr>
+          <tr>
+            <td id="7" onclick="game(7)"></td>
+            <td class="center" id="8" onclick="game(8)"></td>
+            <td id="9" onclick="game(9)"></td>
+          </tr>
+        </table>
+      </div>
+    </div><!-- 'pca-inner' -->
+    
+  </div><!-- /Screen -->
+  <div class='pca-sub'>
+    <div class='pca-top'></div>
+    <div class='pca-mid'>
+      <div class='pca-part'></div>
+    </div><!-- 'pca-mid' -->
+    <div class='pca-bot'></div>
+  </div><!-- 'pca-bot' -->
+</div><!-- 'pca-hold' -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+
+  
+
+    <script  src="js/index.js"></script>
+
+
+
+
+</body>
+
+</html>
