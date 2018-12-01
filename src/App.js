@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import MessagePopup from './MessagePopup';
+import TicTacToeTable from './TicTacToeTable';
 import './App.css';
 
 class App extends Component {
@@ -32,25 +33,33 @@ class App extends Component {
 
     }
 
+    componentDidMount(){
+        document.onkeypress = this.keypadHandler;
+    }
+
     /* Custom functions */
     choosePlayer = (n) => { // Set single players game
-        console.log(n)
-        this.setState({
-            message:{
-                visibility: true,
-                message: "Choose difficulty level",
-                rest: (
-                    <div  id="msgRest">
-                        <button id="easy" onClick={()=> this.chooseDifficulty(0)} className="btn">Easy</button>
-                        <button id="difficult" onClick={()=> this.chooseDifficulty(1)} className="btn">Hard</button>
-                    </div>
-                )
-            },
-            oneP: n==1
-        })
+        if (n==2){
+            this.setState({oneP: false});
+            this.chooseDifficulty(0, true);
+        }
+        else {
+            this.setState({
+                message:{
+                    visibility: true,
+                    message: "Choose difficulty level",
+                    rest: (
+                        <div  id="msgRest">
+                            <button id="easy" onClick={()=> this.chooseDifficulty(0)} className="btn">Easy</button>
+                            <button id="difficult" onClick={()=> this.chooseDifficulty(1)} className="btn">Hard</button>
+                        </div>
+                    )
+                },
+                oneP: true
+            })
+        }
     }
-    chooseDifficulty = (n)=>{
-        console.log(n)
+    chooseDifficulty = (n, isOneP)=>{
         let msg = {
             visibility: true,
             rest: (<div  id="msgRest">
@@ -58,7 +67,7 @@ class App extends Component {
                 <button id="2P" onClick={()=> this.chooseXO('O')} className="btn">O</button>
             </div>)
         };
-        if(true)
+        if(this.state.oneP && !isOneP)
             msg.message = "Choose X or O";
         else
             msg.message = "Player One, choose X or O";
@@ -71,8 +80,11 @@ class App extends Component {
         this.setState({
             playerOneXO: a,
             playerTwoXO: a=='X' ? 'O' : 'X',
-            message:{ visibility: false }
-        })
+            currentPlayer: a,
+            message:{ visibility: false },
+            gameStarted: true
+        });
+        document.getElementById("playerHighlighter").style.display = "block";
     }
     reset = () => {
         this.setState({
@@ -110,10 +122,10 @@ class App extends Component {
                         freeSlots.push(i);
                 }
                 var random = Math.floor(Math.random()*freeSlots.length);
-                game(freeSlots[random]);
+                this.game(freeSlots[random]);
             }
             else {
-                CPU(true);
+                this.CPU(true); //Force CPU to play in difficult mode
             }
         }
         else {
@@ -121,32 +133,41 @@ class App extends Component {
             for (var i=0; i<9; i++)
                 origBoard.push(this.state.board[i]===''? i : this.state.board[i] );
             this.state.fc = 0;
-            var bestSpot = this.minimax(origBoard, playerTwoXO);
+            var bestSpot = this.minimax(origBoard, this.state.playerTwoXO);
             var n = bestSpot.index;
             this.game(n);
         }
     }
     game= (n)=>{
         if(this.state.board[n] == ''){
-            this.state.board[n] = this.state.currentPlayer;
-            this.state.occupiedCount++;
+            let newBoard = this.state.board;
+            let occupiedCount = this.state.occupiedCount+1;
+            newBoard[n] = this.state.currentPlayer;
+            var playerWhoJustPlayed = this.state.currentPlayer;
+            this.setState({
+                board: newBoard,
+                occupiedCount: occupiedCount
+            });
             if(!this.gameOver(n, occupiedCount)){
                 if(this.state.currentPlayer == this.state.playerOneXO){
-                    this.state.currentPlayer = this.state.playerTwoXO;
-                    // $("#playerHighlighter").animate({left: "310px"}); //TODO
+                    this.setState({currentPlayer: this.state.playerTwoXO});
+                    document.getElementById('playerHighlighter').style.left = "310px"
                 }
                 else {
-                    this.state.currentPlayer = this.state.playerOneXO;
-                    // $("#playerHighlighter").animate({left: "210px"});
+                    this.setState({currentPlayer: this.state.playerOneXO});
+                    document.getElementById('playerHighlighter').style.left = "210px"
                 }
-                if (this.state.oneP && this.state.currentPlayer == this.state.playerTwoXO){
-                    setTimeout(this.CPU, 500);// Thinking time
+                if (this.state.oneP && playerWhoJustPlayed == this.state.playerOneXO){
+                    setTimeout(()=>{this.CPU()}, 500);// Thinking time
                 }
             }
             else{
-                this.updateScore;
+                this.updateScore();
                 setTimeout(this.setupBoard, 2500);
-                setTimeout(function(){this.state.message.visibility=false}, 2000) //
+                setTimeout(()=>{
+                    this.setState({ message: { visibility: false}});
+                    document.getElementById("playerHighlighter").style.display = "block";
+                }, 2000) //
                 if (this.state.oneP && this.state.currentPlayer == this.state.playerTwoXO){
                     setTimeout(this.CPU, 3000);//Thinking time
                 }
@@ -155,13 +176,14 @@ class App extends Component {
     }
     gameOver = (n, occupiedCount) => {
         const winCombos = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [7, 5, 3]];
-        if(this.state.occupiedCount <= 9){
+        if(occupiedCount <= 9){
             for (var j=0; j<8; j++){
                 if(winCombos[j].indexOf(n+1) != -1) {
-                    var a = this.state.board[winCombos[j][0]];
-                    var b = this.state.board[winCombos[j][1]];
-                    var c = this.state.board[winCombos[j][2]];
+                    var a = this.state.board[winCombos[j][0]-1];
+                    var b = this.state.board[winCombos[j][1]-1];
+                    var c = this.state.board[winCombos[j][2]-1];
                     if(a == this.state.currentPlayer && b == this.state.currentPlayer && c == this.state.currentPlayer){
+                        document.getElementById("playerHighlighter").style.display = "none";
                         // $("#"+winCombos[j][0]).css("background", "white"); TODO
                         // $("#"+winCombos[j][1]).css("background", "white");
                         // $("#"+winCombos[j][2]).css("background", "white");
@@ -175,7 +197,7 @@ class App extends Component {
                             })
                             this.state.pOneWins++;
                         }
-                        else if (oneP) {
+                        else if (this.state.oneP) {
                             this.setState({
                                 message:{
                                     visibility: true,
@@ -212,7 +234,7 @@ class App extends Component {
                 }
             }
         }
-        if(this.state.occupiedCount == 9){
+        if(occupiedCount == 9){
             this.setState({
                 message:{
                     visibility: true,
@@ -230,8 +252,8 @@ class App extends Component {
         var P1 = "Player";
         var P2 = "CPU";
         if(!this.state.oneP){
-            P1 = "Player " + playerOneXO;
-            P2 = "Player " + playerTwoXO;
+            P1 = "Player " + this.state.playerOneXO;
+            P2 = "Player " + this.state.playerTwoXO;
         }
         // $("#score").html('<b>'+P1+': '+pOneWins+'<span style="display:inline-block; width: 20px;"></span>'+P2+': '+pTwoWins+'</b><button id="resetBtn" onclick="reset()"><i class="fa fa-undo" aria-hidden="true"> Reset</i></button>'); TODO
     }
@@ -241,7 +263,7 @@ class App extends Component {
         if (this.winning(newBoard, this.state.playerOneXO)){
             return {score:-10};
         }
-        else if (winning(newBoard, this.state.playerTwoXO)){
+        else if (this.winning(newBoard, this.state.playerTwoXO)){
             return {score:10};
         }
         else if (availSpots.length === 0){
@@ -303,9 +325,13 @@ class App extends Component {
             return false;
         }
     }
-
-    /* Constants */
-    // const winCombos = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [7, 5, 3]]
+    keypadHandler = (e) => {
+        var key = e.keyCode;
+        var decode = {49:7, 50:8, 51:9,52:4, 53:5, 54:6, 55:1, 56:2, 57:3};
+        if (key>=49 && key <= 57 && this.state.gameStarted){
+            this.game(decode[key]-1);
+        }
+    }
 
 
     render() {
@@ -318,30 +344,12 @@ class App extends Component {
                             <h1> Tic Tac Toe</h1>
                             <div id="playerHighlighter"></div>
                             <h4 id="score">
-                                <b>Player {this.state.playerOneXO}: {this.state.pOneWins}
-                                    <span style={{display:"inlineBlock", width: "20px"}}></span>
-                                    Player {this.state.playerTwoXO}: {this.state.pTwoWins}</b>
+                                <b>Player {this.state.playerOneXO}:</b> {this.state.pOneWins}
+                                    <span style={{display:"inline-block", width: "20px"}}></span>
+                                <b>Player {this.state.playerTwoXO}:</b> {this.state.pTwoWins}
                                 <button id="resetBtn" onClick={this.reset}><i className="fa fa-undo" aria-hidden="true"> Reset</i></button>
                             </h4>
-                            <div id="tableContainer">
-                                <table>
-                                    <tr>
-                                        <td id="1" onClick={()=>this.game(1)}>{this.state.board[0]}</td>
-                                        <td className="center" id="2" onClick={()=>this.game(2)}>{this.state.board[1]}</td>
-                                        <td id="3" onClick={()=>this.game(3)}>{this.state.board[2]}</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="middle" id="4" onClick={()=>this.game(4)}>{this.state.board[3]}</td>
-                                        <td className="middle-center" id="5" onClick={()=>this.game(5)}>{this.state.board[4]}</td>
-                                        <td className="middle" id="6" onClick={()=>this.game(6)}>{this.state.board[5]}</td>
-                                    </tr>
-                                    <tr>
-                                        <td id="7" onClick={()=>this.game(7)}>{this.state.board[6]}</td>
-                                        <td className="center" id="8" onClick={()=>this.game(8)}>{this.state.board[7]}</td>
-                                        <td id="9" onClick={()=>this.game(9)}>{this.state.board[8]}</td>
-                                    </tr>
-                                </table>
-                            </div>
+                            <TicTacToeTable game={this.game} board={this.state.board}/>
                         </div>
                         {/*!<!-- 'pca-inner' -->*/}
 
