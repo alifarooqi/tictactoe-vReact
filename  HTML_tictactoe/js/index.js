@@ -38,24 +38,7 @@ function reset(){
   gameStarted = false;
 }
 function msgScreen(display) {
-  if(display == "difficulty") {
-    $("#msgTitle").html("Choose difficulty level");
-    $("#msgRest").html('<button id="easy" onclick="easy()" class="btn">Easy</button><button id="difficult" onclick="difficult()" class="btn">Hard</button>');
-  }
-  else if(display == "players") {
-    $("#msgTitle").html("Choose number of players");
-    $("#msgRest").html('<button id="1P" onclick="singleP()" class="btn">One Player</button><button id="2P" onclick="twoP()" class="btn">Two Player</button>');
-  }
-  else if(display == "choose") {
-    if(oneP){
-      $("#msgTitle").html("Choose X or O");
-    }
-    else {
-      $("#msgTitle").html("Player One, choose X or O");
-    }
-    $("#msgRest").html('<button id="X" onclick="chooseX()" class="btn">X</button><button id="2P" onclick="chooseO()" class="btn">O</button>');
-  }
-  else if(display == "winner") {
+   if(display == "winner") {
     $("#msgTitle").html("Congragulations!!!");
     if(oneP){
       $("#msgRest").html("<h3>You've won the game!</h3>");
@@ -73,55 +56,6 @@ function msgScreen(display) {
     $("#msgRest").html("<h3>You've lost!</h3>");
   }
   $("#dimmer").fadeIn("slow");
-}
-function easy(){
-  difficulty = 0;
-  msgScreen('choose');
-}
-function difficult(){
-  difficulty = 1;
-  msgScreen('choose');
-}
-function singleP(){
-  oneP = true;
-  msgScreen('difficulty');
-  $("#playerHighlighter").fadeOut();
-}
-function twoP(){
-  oneP=false;
-  msgScreen('choose');
-}
-function chooseX(){
-  playerOneXO = 'X';
-  playerTwoXO = 'O';
-  if(firstTurn == 1){
-    currentPlayer = playerOneXO;
-  }
-  else {
-    currentPlayer = playerTwoXO;
-  }
-  updateScore();
-  if (!oneP){
-    $("#playerHighlighter").fadeIn();
-  }
-  $("#dimmer").fadeOut("fast");
-  gameStarted = true;
-}
-function chooseO(){
-  playerOneXO = 'O';
-  playerTwoXO = 'X';
-  if(firstTurn == 1){
-    currentPlayer = playerOneXO;
-  }
-  else {
-    currentPlayer = playerTwoXO;
-  }
-  updateScore();
-  if (!oneP){
-    $("#playerHighlighter").fadeIn();
-  }
-  $("#dimmer").fadeOut("fast");
-  gameStarted = true;
 }
 var setupBoard = function setBoard(){
   for(var i=1; i<10; i++){
