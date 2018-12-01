@@ -28,6 +28,7 @@ $(document).ready(function main(){
 };
 });
 
+// Partially done
 function reset(){
   pOneWins = 0;
   pTwoWins = 0;
@@ -37,6 +38,7 @@ function reset(){
   $("#playerHighlighter").fadeOut();
   gameStarted = false;
 }
+
 function msgScreen(display) {
    if(display == "winner") {
     $("#msgTitle").html("Congragulations!!!");
@@ -64,53 +66,7 @@ var setupBoard = function setBoard(){
   }
   occupiedCount = 0;
 }
-var CPU = function(){
-  if (difficulty === 0){
-    var IO = Math.floor(Math.random()*2);
-      if (IO === 0) {
-      var freeSlots = [];
-      for (var i=1; i<10; i++){
-        if($("#"+i).html() == ""){
-          freeSlots.push(i);
-        }
-      }
-      var random = Math.floor(Math.random()*freeSlots.length)
-      game(freeSlots[random]);
-    }
-    else {
-      var origBoard = [];
-      for (var i=1; i<10; i++) {
-        var sign = $("#"+i).html();
-        if (sign == ""){
-          origBoard.push(i-1);
-        }
-        else{
-          origBoard.push(sign);
-        }
-      }
-      fc = 0;
-      var bestSpot = minimax(origBoard, playerTwoXO);
-      var n = bestSpot.index+1;
-      game(n);
-    }
-  }
-  else {
-    var origBoard = [];
-    for (var i=1; i<10; i++) {
-      var sign = $("#"+i).html();
-      if (sign == ""){
-        origBoard.push(i-1);
-      }
-      else{
-        origBoard.push(sign);
-      }
-    }
-    fc = 0;
-    var bestSpot = minimax(origBoard, playerTwoXO);
-    var n = bestSpot.index+1;
-    game(n);
-  }
-}
+
 function game(n){
   if($("#"+n).html() == ""){
     $("#"+n).html(currentPlayer);
@@ -180,6 +136,7 @@ function gameOver(n, occupiedCount){
     return false;
   }
 }
+
 function updateScore(){
   var P1 = "Player";
   var P2 = "CPU";
