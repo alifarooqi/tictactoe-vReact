@@ -1,3 +1,6 @@
+# Tic Tac Toe
+
+You can play the game here: [https://alifarooqi.github.io/tic-tac-toe/](https://alifarooqi.github.io/tic-tac-toe/)
 
 ## Available Scripts
 
